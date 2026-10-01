@@ -1,7 +1,7 @@
 ARG GRYPE_VERSION=latest
 
 # Extract the grype binary from the distroless official image
-FROM anchore/grype:v${GRYPE_VERSION} AS grype
+FROM anchore/grype:${GRYPE_VERSION} AS grype
 
 # Use alpine as the base since the official grype image is distroless (no shell)
 FROM alpine:3.23.3
