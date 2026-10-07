@@ -90,7 +90,7 @@ spec:
   - conftest
   - test
   - --no-color
-  - --update=https://raw.githubusercontent.com/jessesuen/kargo-custom-steps/master/policy/kubernetes.rego
+  - --update=https://raw.githubusercontent.com/<your-org>/kargo-custom-steps/main/policy/kubernetes.rego
   - --policy=/tmp/policy
   - ${{ config.path }}
 ```
@@ -101,7 +101,7 @@ Trivy is an open-source, all-in-one security scanner that detects vulnerabilitie
 
 The following example shows how a `trivy-image` step can scan an image for `CRITICAL` vulnerabilities before proceeding with the promotion.
 
-> **Note:** The custom image `ghcr.io/jessesuen/trivy` pre-caches the vulnerability databases to avoid downloading them on every promotion run. See [`docker/trivy/README.md`](docker/trivy/README.md) for details.
+> **Note:** The custom image `ghcr.io/<your-org>/trivy` pre-caches the vulnerability databases to avoid downloading them on every promotion run. See [`docker/trivy/README.md`](docker/trivy/README.md) for details.
 
 ```yaml
 apiVersion: ee.kargo.akuity.io/v1alpha1
@@ -109,7 +109,7 @@ kind: CustomPromotionStep
 metadata:
   name: trivy-image
 spec:
-  image: ghcr.io/jessesuen/trivy:0.69.3
+  image: ghcr.io/<your-org>/trivy:0.69.3
   command:
   - trivy
   - image
@@ -130,9 +130,9 @@ metadata:
 spec:
   vars:
   - name: image
-    value: ghcr.io/jessesuen/nginx
+    value: ghcr.io/<your-org>/nginx
   - name: repoURL
-    value: https://github.com/jessesuen/kargo-custom-steps.git
+    value: https://github.com/<your-org>/kargo-custom-steps.git
   - name: branch
     value: main
 
