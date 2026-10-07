@@ -65,7 +65,7 @@ NOTE: Custom promotion steps require pod-based promotions available only on the 
 
 ## Examples
 
-This repository showcases two real-world examples of custom promotion steps:
+This repository showcases several real-world examples of custom promotion steps:
 
 * `opa-test` - validate Kubernetes manifests using centrally managed OPA rules, before proceeding with promotion.
 * `trivy-image` - scan the promoted image for vulnerabilities, before proceeding with promotion.
@@ -168,6 +168,7 @@ spec:
       path: ./out
 
   # 5. (Custom) Scan the promoted image for CRITICAL vulnerabilities
+  ##   grype or trivy can be used interchangeably here. For this example, we will use trivy
   - uses: trivy-image
     config:
       image: ${{ vars.image }}:${{ imageFrom( vars.image ).Tag }}
@@ -181,6 +182,12 @@ spec:
   - uses: git-push
     config:
       path: ./src
+ 
+  # 7. Have Argo CD sync these changes
+  - uses: argocd-update
+    config:
+      apps:
+      - name: custom-steps-${{ ctx.stage }}
 ```
 
-The custom steps (`opa-test` and `trivy-image`) act as policy and security gates — if either fails, the promotion is blocked before any changes are committed.
+The custom steps (`opa-test` and `trivy-image`) act as policy and security gates — if either fails, the promotion is blocked before any changes are committed and synced in Argo CD.
