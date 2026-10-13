@@ -18,7 +18,7 @@ spec:
     spec:
       destination:
         namespace: custom-steps-{{path.basename}}
-        name: demo
+        name: k3d-staging
       project: custom-steps
       source:
         path: charts/app
@@ -26,3 +26,6 @@ spec:
         helm:
           valueFiles:
           - "/env/{{path.basename}}/values.yaml"
+      syncPolicy:                  # new
+        syncOptions:
+        - CreateNamespace=true
