@@ -6,7 +6,7 @@ metadata:
 spec:
   generators:
   - git:
-      repoURL: https://github.com/jessesuen/kargo-custom-steps.git
+      repoURL: https://github.com/Tchaikvsky/kargo-custom-steps.git
       revision: HEAD
       directories:
       - path: env/*
@@ -22,7 +22,7 @@ spec:
       project: custom-steps
       source:
         path: charts/app
-        repoURL: https://github.com/jessesuen/kargo-custom-steps.git
+        repoURL: https://github.com/Tchaikvsky/kargo-custom-steps.git
         helm:
           valueFiles:
           - "/env/{{path.basename}}/values.yaml"
