@@ -7,6 +7,7 @@ metadata:
     kargo.akuity.io/color: green
     kargo.akuity.io/argocd-context: '[{"name":"custom-steps-dev","namespace":"argocd"}]'
 spec:
+  shard: kargo-custom-steps
   requestedFreight:
   - origin:
       kind: Warehouse
@@ -29,6 +30,7 @@ metadata:
     kargo.akuity.io/color: yellow
     kargo.akuity.io/argocd-context: '[{"name":"custom-steps-staging","namespace":"argocd"}]'
 spec:
+  shard: kargo-custom-steps
   requestedFreight:
   - origin:
       kind: Warehouse
@@ -53,6 +55,7 @@ metadata:
     kargo.akuity.io/color: red
     kargo.akuity.io/argocd-context: '[{"name":"custom-steps-prod-us","namespace":"argocd"}]'
 spec:
+  shard: kargo-custom-steps
   requestedFreight:
   - origin:
       kind: Warehouse
@@ -76,6 +79,7 @@ metadata:
     kargo.akuity.io/color: red
     kargo.akuity.io/argocd-context: '[{"name":"custom-steps-prod-eu","namespace":"argocd"}]'
 spec:
+  shard: kargo-custom-steps
   requestedFreight:
   - origin:
       kind: Warehouse

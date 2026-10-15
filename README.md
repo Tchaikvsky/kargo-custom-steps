@@ -16,7 +16,18 @@ Examples of when you would use custom steps include:
 * Infrastructure automation: `ansible`, `chef`, `puppet`
 * Bespoke tools, scripts, and internal system integrations
 
+## Prerequisites
+
+Custom promotion steps run as pods in a cluster you own, so they need extra setup on the Kargo side:
+
+1. **Kargo v1.10 or newer.** Check the version on your Kargo instance's overview page in the Akuity Platform.
+2. **A self-hosted Kargo agent.** Promotions that use custom steps run as pods inside your own cluster. The Akuity-managed agent can't run them.
+3. **The Promotion Controller enabled on that agent.** Without it, Kargo doesn't recognize custom step kinds and promotions fail with:
+
 ## How it works
+
+> [!NOTE]
+> Custom steps require the 
 
 To define a new promotion step, a `CustomPromotionStep` resource is registered which specifies:
 * The container `image` to run.
