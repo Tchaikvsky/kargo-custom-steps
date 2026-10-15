@@ -1,5 +1,5 @@
 image:
-  tag: latest
+  tag:  1.29.6
 
 securityContext:
   privileged: true
