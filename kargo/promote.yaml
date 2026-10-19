@@ -39,6 +39,15 @@ spec:
     config:
       path: ./out
 
+  # Same rules as policy/kubernetes.rego, written as Kyverno policies, so the
+  # demo shows two policy engines gating the same rendered manifests.
+  # Fails on any violation; see the step's README for failOn and other options.
+  - uses: kyverno-validate
+    as: kyverno
+    config:
+      policies: ./src/policy/kyverno
+      manifests: ./out
+
   # Can use grype or trivy interchangeably
   # - uses: grype
   - uses: trivy-image

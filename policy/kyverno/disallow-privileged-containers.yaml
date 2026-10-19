@@ -1,0 +1,31 @@
+# Kyverno equivalent of the first rule in policy/kubernetes.rego.
+# Checked at promotion time by the kyverno-validate step (see kargo/promote.yaml);
+# it is never installed into a cluster, so validationFailureAction only matters
+# if you later reuse this file with a Kyverno admission controller.
+#
+# The rule matches Pods. Kyverno auto-generates the equivalent rules for
+# Deployments, StatefulSets, Jobs and so on, so rendered Deployments are covered.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged-containers
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: privileged-containers
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Privileged containers are not allowed: set securityContext.privileged to false or remove it."
+        pattern:
+          spec:
+            =(initContainers):
+              - =(securityContext):
+                  =(privileged): "false"
+            containers:
+              - =(securityContext):
+                  =(privileged): "false"

@@ -1,0 +1,58 @@
+# Source: https://github.com/akuity/sedemo-platform/blob/main/kargo-shared/oras-push.yaml
+# Copied unchanged from upstream (commit ca13885).
+#
+# CustomPromotionStep: oras-push
+#
+# Packages a directory as a tar+gzip archive and pushes it as a single OCI layer
+# using the Argo CD native content media type, so Argo CD can sync directly from
+# the registry without a CMP plugin.
+#
+# Called during the `dev` stage AFTER kustomize-build has written:
+#   ./bundle/dev/manifests.yaml   ./bundle/test/manifests.yaml
+#   ./bundle/stage/manifests.yaml ./bundle/prod/manifests.yaml
+#
+# Argo CD Applications select their env via `source.path: <env>`.
+#
+# Required config keys:
+#   registry, repository, tag  — OCI coordinates
+#   path                       — workspace-relative dir to package (e.g. ./bundle)
+#   mediaType                  — layer media type
+#                                (application/vnd.cncf.argoproj.argocd.content.v1.tar+gzip)
+#   orasUsername, orasPassword — registry credentials
+#
+# Required shared secret: oci-airgap-registry
+#   keys: username, password  (e.g. a GHCR PAT with write:packages scope)
+apiVersion: ee.kargo.akuity.io/v1alpha1
+kind: CustomPromotionStep
+metadata:
+  name: oras-push
+spec:
+  image: ghcr.io/oras-project/oras:v1.2.2
+  command:
+    - /bin/sh
+    - -c
+    - |
+      set -eu
+      # Point Docker config to a writable temp dir — the container runs non-root
+      # and cannot write to /.docker.
+      export DOCKER_CONFIG=/tmp/.docker
+      mkdir -p /tmp/.docker
+      # Authenticate to the OCI registry.
+      echo "${{ config.orasPassword }}" | oras login "${{ config.registry }}" \
+        --username "${{ config.orasUsername }}" \
+        --password-stdin >/dev/null 2>&1
+
+      # Package the bundle directory as a single tar+gzip archive.
+      # -C changes into the directory so paths inside the archive are relative
+      # (dev/manifests.yaml, test/manifests.yaml, ...) — matching Argo CD's
+      # path-based source selection.
+      tar -czf /tmp/bundle.tar.gz -C "/workdir/${{ config.path }}" .
+
+      # Push as a single OCI layer. ORAS rejects absolute paths, so cd to /tmp first.
+      cd /tmp
+      oras push \
+        "${{ config.registry }}/${{ config.repository }}:${{ config.tag }}" \
+        --artifact-type "application/vnd.cncf.argoproj.argocd.config.v1+json" \
+        "bundle.tar.gz:application/vnd.oci.image.layer.v1.tar+gzip"
+
+      echo "Pushed OCI bundle: ${{ config.registry }}/${{ config.repository }}:${{ config.tag }}"

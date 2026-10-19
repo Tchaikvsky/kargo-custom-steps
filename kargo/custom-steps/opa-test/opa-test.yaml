@@ -12,7 +12,7 @@ spec:
     conftest test \
       --no-color \
       --output=table \
-      --update=https://raw.githubusercontent.com/jessesuen/kargo-custom-steps/master/policy/kubernetes.rego \
+      --update=https://raw.githubusercontent.com/Tchaikvsky/kargo-custom-steps/main/policy/kubernetes.rego \
       --policy=/tmp/policy \
       ${{ config.path }} \
       > /tmp/output

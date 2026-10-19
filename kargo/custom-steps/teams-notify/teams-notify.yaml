@@ -1,0 +1,68 @@
+# Source: https://github.com/akuity/sedemo-platform/blob/main/kargo-shared/teams-notify.yaml
+# Copied unchanged from upstream (commit ca13885).
+#
+# CustomPromotionStep: teams-notify
+#
+# Posts an Adaptive Card to Microsoft Teams via a Power Automate workflow webhook.
+# Create the webhook URL in Teams: Apps → Workflows → "Post to a channel when a
+# webhook request is received". No third-party services involved.
+#
+# Required config keys:
+#   webhookURL — Power Automate workflow webhook URL (reference via secrets)
+#   title      — Card heading
+#   message    — Body text shown in the card
+#   stage      — Stage name shown as a fact row
+#   freight    — Freight ID shown as a fact row
+#
+# Example invocation:
+#   - uses: teams-notify
+#     config:
+#       webhookURL: ${{ secret("teams-webhook")["teams-webhook"] }}
+#       title: "Promoted to ${{ ctx.stage }}"
+#       message: "guestbook ${{ imageFrom('ghcr.io/akuity/guestbook').Tag }} is live"
+#       stage: ${{ ctx.stage }}
+#       freight: ${{ ctx.targetFreight.name }}
+apiVersion: ee.kargo.akuity.io/v1alpha1
+kind: CustomPromotionStep
+metadata:
+  name: teams-notify
+spec:
+  image: curlimages/curl:8.11.0
+  command:
+  - sh
+  - -c
+  - |
+    curl -sf -X POST "${{ config.webhookURL }}" \
+      -H 'Content-Type: application/json' \
+      -d "{
+        \"type\": \"message\",
+        \"attachments\": [{
+          \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+          \"content\": {
+            \"type\": \"AdaptiveCard\",
+            \"version\": \"1.5\",
+            \"body\": [
+              {
+                \"type\": \"TextBlock\",
+                \"text\": \"${{ config.title }}\",
+                \"weight\": \"Bolder\",
+                \"size\": \"Large\",
+                \"color\": \"Accent\",
+                \"wrap\": true
+              },
+              {
+                \"type\": \"FactSet\",
+                \"facts\": [
+                  {\"title\": \"Stage\",   \"value\": \"${{ config.stage }}\"},
+                  {\"title\": \"Freight\", \"value\": \"${{ config.freight }}\"}
+                ]
+              },
+              {
+                \"type\": \"TextBlock\",
+                \"text\": \"${{ config.message }}\",
+                \"wrap\": true
+              }
+            ]
+          }
+        }]
+      }"

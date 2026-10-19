@@ -1,0 +1,21 @@
+# Kyverno equivalent of the second rule in policy/kubernetes.rego.
+# See disallow-privileged-containers.yaml for how this file is used.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-host-network
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: host-network
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "hostNetwork is not allowed."
+        pattern:
+          spec:
+            =(hostNetwork): "false"

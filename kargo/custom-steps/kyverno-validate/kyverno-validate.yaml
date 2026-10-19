@@ -1,0 +1,52 @@
+# Source: https://github.com/blakepettersson/curated-custom-promotion-tasks/tree/main/kyverno/steps/kyverno-validate
+# Copied unchanged from upstream (commit ab059ee). The image is built, tested and
+# published by that repo; this file only registers it with our Kargo instance.
+# To upgrade, bump the image tag here after checking the upstream changelog.
+#
+# Registers the `kyverno-validate` step with a Kargo cluster. CustomPromotionStep
+# is cluster-scoped and can only be created by a Kargo cluster admin.
+#
+#   kargo apply -f custom-promotion-step.yaml
+#
+# Applied through the Kargo API rather than kubectl: custom steps are an Akuity
+# Platform feature, and the control plane there is not directly reachable.
+#
+# Requires Kargo on the Akuity Platform v1.10+ with the Promotion Controller
+# enabled and a self-hosted agent (custom steps run as pods).
+apiVersion: ee.kargo.akuity.io/v1alpha1
+kind: CustomPromotionStep
+metadata:
+  name: kyverno-validate
+spec:
+  # Published by ../../../.github/workflows/kyverno-validate.yaml, which tags a
+  # release from `kyverno-validate/vX.Y.Z`. Pinned deliberately: `:main` tracks
+  # every push. Swap in a digest if you want it immutable.
+  image: ghcr.io/blakepettersson/curated-custom-promotion-tasks/kyverno-validate:v0.1.0
+
+  command: ["/usr/local/bin/kyverno-validate"]
+
+  # The whole step config is handed over as one JSON object, so every key below
+  # is optional as far as the expression engine is concerned and nested values
+  # (lists of paths, for instance) survive intact.
+  env:
+    - name: KYVERNO_VALIDATE_CONFIG
+      value: ${{ asJSON(config) }}
+
+  # The step writes its results to $KARGO_OUTPUT as JSON.
+  output:
+    source:
+      type: Pipe
+      format: JSON
+
+  defaultTimeout: 10m
+  # Validation is deterministic: a retry cannot turn a rejected policy into an
+  # accepted one, so fail on the first attempt.
+  defaultErrorThreshold: 1
+
+  # The Kyverno CLI holds the whole policy and resource set in memory.
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
