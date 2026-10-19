@@ -2,11 +2,11 @@
 
 ## Overview
 
-Custom Promotion Steps allow Kargo administrators to easily introduce new promotion steps to Kargo.
+Custom Promotion Steps allow Kargo administrators to easily introduce new promotion steps to Kargo that aren't necessarily included right out of the box.
 
 ## Why custom steps?
 
-Kargo's built-in steps handle the most common GitOps promotion operations out of the box, with native integrations for Argo CD, Terraform, OCI, and Git. But every organization has unique requirements — custom security gates, internal tooling, or compliance checks that don't fit a standard mold. Custom steps make these possible.
+Kargo's built-in steps handle the most common GitOps promotion operations with native integrations for Argo CD, Terraform, OCI, and Git. But every organization has unique requirements such as custom security gates, internal tooling, or compliance checks that don't fit a standard mold. With custom steps, it's possible to customize Kargo to meet these requirements.
 
 Examples of when you would use custom steps include:
 * Supply chain security verification: `cosign`, `notation`
@@ -21,11 +21,11 @@ Examples of when you would use custom steps include:
 Custom promotion steps run as pods in a cluster you own, so they need extra setup on the Kargo side:
 
 1. **Kargo v1.10 or newer.** Check the version on your Kargo instance's overview page in the Akuity Platform.
-2. **A self-hosted Kargo agent.** Promotions that use custom steps run as pods inside your own cluster. The Akuity-managed agent can't run them.
-3. **The Promotion Controller enabled on that agent.** Without it, Kargo doesn't recognize custom step kinds and promotions fail with:
+2. **A self-hosted Kargo agent.** Promotions that use custom steps run as pods inside your own cluster. Because of this, a self-hosted agent is required.
+3. **The Promotion Controller enabled on that agent.** Without it, Kargo doesn't recognize custom step kinds and promotions fail with with a message that may look similar to this:
 
    ```
-   step kind "opa-test" is not registered; verify the kind is correct; if you are a Kargo Enterprise user, you may need to enable the promotion controller
+   step kind "<custom-step-name>" is not registered; verify the kind is correct; if you are a Kargo Enterprise user, you may need to enable the promotion controller
    ```
 
 4. **Stages assigned to that agent.** Set `spec.shard` on each Stage to the self-hosted agent's name, unless that agent is your default shard.
