@@ -43,4 +43,4 @@ jobs:
           push: true
           build-args: |
             GRYPE_VERSION=${{ inputs.tag }}
-          tags: ghcr.io/${{ steps.owner.outputs.name }}/trivy:${{ inputs.tag }}
+          tags: ghcr.io/${{ steps.owner.outputs.name }}/grype:${{ inputs.tag }}

@@ -22,7 +22,7 @@ Custom promotion steps run as pods in a cluster you own, so they need extra setu
 
 1. **Kargo v1.10 or newer.** Check the version on your Kargo instance's overview page in the Akuity Platform.
 2. **A self-hosted Kargo agent.** Promotions that use custom steps run as pods inside your own cluster. Because of this, a self-hosted agent is required.
-3. **The Promotion Controller enabled on that agent.** Without it, Kargo doesn't recognize custom step kinds and promotions fail with with a message that may look similar to this:
+3. **The Promotion Controller enabled on that agent.** Without it, Kargo doesn't recognize custom step kinds and promotions fail with a message that may look similar to this:
 
    ```
    step kind "<custom-step-name>" is not registered; verify the kind is correct; if you are a Kargo Enterprise user, you may need to enable the promotion controller
