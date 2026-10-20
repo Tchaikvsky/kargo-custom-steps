@@ -42,56 +42,6 @@ Custom promotion steps run as pods in a cluster you own, so they need extra setu
 > [!IMPORTANT]
 > `CustomPromotionStep` is **cluster-scoped**: a step is registered once for the whole Kargo instance, not per project. If two repositories register a step with the same name, they overwrite each other. Check the existing steps before you pick a name.
 
-## Architecture
-
-How the pieces in this repository connect once [setup](docs/setup.md) is done:
-
-```mermaid
-flowchart LR
-  subgraph git["GitHub: kargo-custom-steps"]
-    direction TB
-    argodir["argocd/"]
-    kargodir["kargo/"]
-    envdir["env/ + charts/app"]
-  end
-
-  subgraph argocd["Argo CD (Akuity Platform)"]
-    direction TB
-    bootstrap["custom-steps-bootstrap"]
-    appset["ApplicationSet"]
-    stageapps["custom-steps-&lt;stage&gt; apps"]
-    kargoapp["custom-steps-kargo"]
-  end
-
-  subgraph kargo["Kargo (Akuity Platform)"]
-    direction TB
-    warehouse["Warehouse"]
-    stages["Stages<br/>dev → staging → prod-us, prod-eu"]
-    steps["CustomPromotionSteps"]
-  end
-
-  subgraph cluster["Your cluster"]
-    direction TB
-    agent["Self-hosted agent<br/>+ Promotion Controller"]
-    pod["Promotion pod<br/>render → gates → commit → sync"]
-    workloads["Workloads"]
-  end
-
-  argodir --> bootstrap --> appset --> stageapps
-  kargodir --> kargoapp -- registers --> kargo
-  warehouse -- freight --> stages
-  stages -- promote --> agent --> pod
-  pod -- commits image tag --> envdir
-  pod -- argocd-update --> stageapps
-  envdir -. source .-> stageapps
-  stageapps -- deploys --> workloads
-```
-
-1. **Argo CD** applies everything in Git. The bootstrap app creates the ApplicationSet, which creates one app per stage, and the `custom-steps-kargo` app registers the Warehouse, Stages, PromotionTask and custom steps with Kargo.
-2. **Kargo** sees new Freight in the Warehouse. When you promote it to a Stage, the Stage's `shard` sends the promotion to the self-hosted agent.
-3. **The Promotion Controller** runs every step of the promotion in one pod in your cluster. The custom steps (the policy and scan gates) run there between rendering and committing, so a failing gate stops the promotion before anything is pushed.
-4. **The last steps** commit the new image tag to `env/<stage>/values.yaml` and tell Argo CD to sync that stage's app.
-
 ## How it works
 
 To define a new promotion step, a `CustomPromotionStep` resource is registered which specifies:
