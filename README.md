@@ -392,7 +392,3 @@ The custom steps (`opa-test`, `kyverno-validate` and `trivy-image`) act as polic
 6. [Harden it](docs/creating-custom-steps.md#6-harden-it)
 7. [Build, test and publish an image](docs/creating-custom-steps.md#7-build-test-and-publish-an-image)
 8. [Register and document it](docs/creating-custom-steps.md#8-register-and-document-it)
-
-## Setup
-
-**[docs/setup.md](docs/setup.md)** takes a fresh fork of this repository to a working pipeline: pointing it at your own account and cluster, bootstrapping Argo CD, preparing Kargo (self-hosted agent, Promotion Controller, shards), applying the Kargo resources, and Git credentials. It ends with a [troubleshooting table](docs/setup.md#troubleshooting) of the errors you are most likely to hit.
